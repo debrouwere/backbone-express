@@ -1,0 +1,27 @@
+{
+  "author": "Stijn Debrouwere",
+  "name": "backbone-express",
+  "version": "0.2.0",
+  "repository": {
+    "url": ""
+  },
+  "engines": {
+    "node": "0.6.x"
+  },
+  "main": "lib/index.js",
+  "dependencies": {
+    "express": "2.x",
+    "underscore": "1.x",
+    "underscore.string": "",
+    "request": "1.x",
+    "jsdom": "0.2.x",
+    "railgun": "0.1.x",
+    "optimist": "0.3.x"
+  },
+  "devDependencies": {
+    "mocha": "0.14.x"
+  },
+  "scripts": {
+    "install": "make"
+  }
+}
