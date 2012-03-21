@@ -1,33 +1,50 @@
-fs = require 'fs'
-path = require 'path'
+request = require 'request'
 express = require 'express'
 _ = require 'underscore'
 _.str = require 'underscore.string'
-# TODO: this isn't proper, 'fcourse
-#{sync} = require '../example/vendor/backbone-express-client/0.1.0/index.coffee'
 
-fetch_collections = (root) ->
-    files = fs.readdirSync path.join root, '/lib/models'
-    collections = _(files).chain()
-        .map (file) ->
-            if _.str.endsWith file, '.js'
-                objects = require path.join root, '/lib/models/', file
-                return _.filter objects, (object) ->
-                    # collections have an `all` method, models do not
-                    object::all?
-            else
-                return false
-        .compact()
-        .flatten()
-        .value()
-
+# TODO: `methods`, `url_for` and `sync` are duplicated in backbone-express-client
+# if possible try to define a single time and reuse, and see if I really
+# use them in both files
 methods =
-    post: "create"
-    get: "read"
-    put: "update"
-    delete: "delete"
+    http:
+        create: "post"
+        read: "get"
+        update: "put"
+        delete: "del"
+    backbone:
+        post: "create"
+        get: "read"
+        put: "update"
+        delete: "delete"
 
-exports.serve = (root, routers) ->
+url_for = (object) ->
+    if typeof object.url is 'function'
+        object.url()
+    else if typeof object.url is 'string'
+        object.url
+
+sync = (method, model, options) ->
+    console.log typeof model.url
+
+    params =
+        method: methods.http[method]
+        uri: url_for(model)
+
+    request params, (error, response, body) ->
+        content = JSON.parse body
+    
+        if !error and response.statusCode < 300
+            options.success content, response, body
+        else
+            options.error error, response, body
+
+getCollections = (models) ->
+    _.filter models, (object) ->
+        # collections have an `all` method, models do not
+        object::all?
+
+exports.serve = (root, routers, models) ->
     app = express.createServer()
     
     # serve static assets
@@ -47,8 +64,8 @@ exports.serve = (root, routers) ->
     # provide a proxy to sidestep cross-domain scripting issues
     # TODO: temporarily disabled while I'm trying to get backbone-express
     # running again with the new 'nobones' architecture
-    ###
-    collections = fetch_collections root
+
+    collections = getCollections models
     _(collections).each (collection) ->
         collection = new collection()
         route = "/api/#{collection.plural}/:id?"
@@ -62,11 +79,10 @@ exports.serve = (root, routers) ->
                 model = collection.model
                 endpoint = endpoint + "/#{req.params.id}"
 
-            method = methods[req.method.toLowerCase()]
+            method = methods.backbone[req.method.toLowerCase()]
 
-            sync method, model, success: (model, response) ->
+            sync method, model, success: (model, response, body) ->
                 res.contentType 'application/json'
-                res.send response.body 
-    ###
+                res.send body
 
     app

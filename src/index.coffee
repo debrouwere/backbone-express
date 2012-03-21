@@ -35,7 +35,7 @@ We need to do this in JSDOM and execute all JavaScript on the page because you c
 fs = require 'fs'
 fs.path = require 'path'
 _ = require 'underscore'
-#utils = require './utils'
+# TODO: once railgun is more stable, require it as a regular package
 railgun = require '/Users/stdbrouw/Projects/Apps/railgun/src'
 jsdom = require 'jsdom'
 server = require './server'
@@ -52,6 +52,8 @@ railgun.bundle root, (errors, bundle) ->
     application = (bundle.find '/application.min.js').origin
 
     # TODO: we should automate this, of course
+    # NOTE that we shouldn't really load init since we don't need that
+    # on the server (though perhaps it does no harm)
     scripts = [
         'vendor/jquery/1.7.1/jquery.min.js',
         'vendor/underscore/1.3.1/underscore.min.js',
@@ -68,13 +70,20 @@ railgun.bundle root, (errors, bundle) ->
         html: index
         src: scripts
         done: (errors, window) ->
+            ###
             console.log errors
             console.log window.Backbone?
             console.log window.Express?
+            console.log _.keys window.models
+            console.log _.keys window.views
+            console.log _.keys window.jade.templates
+            ###
+
+            window.Express.isServer = yes
+            window.log = console.log
             
-            #router = new window.routers.Router()
-            #_(router.routes).each (view, route) ->
-            #    console.log "route: `#{route}`"
-            server.serve null, window.routers
+            express = server.serve null, window.routers, window.models
+            #window.close()
+            express.listen 3000
             
     jsdom.env env

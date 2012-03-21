@@ -1,9 +1,10 @@
-Backbone = require 'backbone-express-client'
+models = window.models = {}
+{Express} = window
 
-class exports.Instrument extends Backbone.Model
+class models.Instrument extends Express.Model
 
-class exports.Instruments extends Backbone.Collection
-    model: exports.Instrument
+class models.Instruments extends Express.Collection
+    model: models.Instrument
     plural: 'instruments'
     endpoint: 'https://raw.github.com/stdbrouw/backbone-express-example/master/src/assets/data.json'
-    endpoint: 'http://localhost:3400/clientside/backbone-express-example/src/assets/data.json'
+    endpoint: 'http://localhost:3400/backbone-express-example-data.json'

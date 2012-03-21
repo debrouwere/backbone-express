@@ -10,6 +10,7 @@
   },
   "main": "lib/index.js",
   "dependencies": {
+    "backbone": "",
     "express": "2.x",
     "underscore": "1.x",
     "underscore.string": "",

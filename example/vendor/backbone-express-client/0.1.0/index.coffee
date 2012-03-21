@@ -1,5 +1,12 @@
 exports ?= {}
 
+exports.isServer = process?
+
+# DEBUGGING
+
+log = ->
+    window.log.apply @, arguments
+
 if process?
     Backbone = require 'backbone'
     request = require 'request'
@@ -13,6 +20,8 @@ methods =
     delete: "del"
 
 establish_window = (callback) ->
+    return callback undefined, window
+
     if process?
         jsdom = require 'jsdom'
         jsdom.env '<html></html>', (errors, window) ->
@@ -29,10 +38,13 @@ exports.url_for = (object) ->
 class exports.Router extends Backbone.Router
     render: (views, options = {}) ->    
         # we only render layout chrome when we really need to (a.k.a. on the server)
-        if @layout and @server
+        # TODO: @server disabled because it's not working, but we really do need 
+        # to make this distinction or client-side rendering will be really suboptimal
+        if @layout and window.Express.isServer
+            log 'ADD LAYOUT'
             views.unshift @layout
     
-        establish_window (errors, window) =>
+        establish_window (errors, __) =>
             # TODO: if we keep view.prepare in there, we'll need to replace 
             # this with async.series because subviews may depend on a more 
             # general view being rendered first.
@@ -52,7 +64,7 @@ class exports.Router extends Backbone.Router
             # we want, we still need to send it to the client
             if @server
                 html = '<!DOCTYPE html>\n' + window.document.getElementsByTagName('html')[0].outerHTML
-                console.log "rendering #{@server.req.url}"
+                log "rendering #{@server.req.url}"
                 @server.res.send html
 
             return this
@@ -65,11 +77,16 @@ class exports.View extends Backbone.View
     # `window` is a keyword argument because on the server, we explicitly
     # pass in a window object since there's no `window` global
     render: (window = window) ->    
+        log 'VIEW RENDER FOR ' + @id
         if @id
             el = window.document.getElementById @id
         else
+            # TODO: with the new way the app is set up, 
+            # where all your scripts and such are in the entrypoint file (index.tpl), 
+            # it would seem to make much more sense to have layouts apply to `body`
+            # instead, to prevent duplication.
             el = window.document.getElementsByTagName('html')[0]
-        
+
         el.innerHTML = @template(@options)
 
         title = @options.title or @title
@@ -103,7 +120,7 @@ class exports.Collection extends Backbone.Collection
     # fetch content from external APIs through a relay when fetching client-side, 
     # to avoid AJAX cross-domain limitations
     url: ->
-        if process?
+        if window.Express.isServer
             @endpoint
         else
             "/api/#{@plural}"

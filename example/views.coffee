@@ -1,17 +1,18 @@
-Backbone = require 'backbone-express-client'
+views = window.views = {}
+{Express, jade: {templates}} = window
 
-class exports.Layout extends Backbone.View
-    template: require './templates/layout'
+class views.Layout extends Express.View
+    template: templates.layout
 
-class exports.Home extends Backbone.View
+class views.Home extends Express.View
     id: 'page'
     title: 'Homepage'
-    template: require './templates/home'
+    template: templates.home
 
-class exports.Detail extends Backbone.View
+class views.Detail extends Express.View
     id: 'page'
     title: 'Detail'
-    template: require './templates/detail'
+    template: templates.detail
 
 ###
 prepare: (callback) ->
