@@ -1,6 +1,7 @@
 {
   "author": "Stijn Debrouwere",
   "name": "backbone-express",
+  "description": "Backbone-express serves Backbone applications with a server-side fallback, so they're visible to search engines.",
   "version": "0.2.0",
   "repository": {
     "url": ""
