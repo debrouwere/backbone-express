@@ -37,24 +37,21 @@ server = require './server'
 {argv} = require 'optimist'
 
 exports.serve = (root, port) ->
+    basepath = fs.path.dirname root
+
     railgun.bundle root, (errors, bundle) ->
-        index = (bundle.find '/index.jade').content
+        index = (bundle.find '/index.html').content
         application = (bundle.find '/application.min.js').content
 
-        # TODO: we should automate this, of course
-        # NOTE that we shouldn't really load init since we don't need that
-        # on the server (though perhaps it does no harm)
-        scripts = [
-            'vendor/jquery/1.7.1/jquery.min.js',
-            'vendor/underscore/1.3.1/underscore.min.js',
-            'vendor/backbone-express/0.1.0/backbone-express.min.js'
-            'vendor/jade/0.21.0/runtime.min.js'
-            ]
+        scripts = bundle.optimizedLinks.scripts.map (script) ->
+            script = bundle.find '/' + script
 
-        scripts = scripts.map (script) ->
-            path = fs.path.join process.cwd(), 'example', script
-            fs.readFileSync path, 'utf8'
-        scripts.push application
+            # TODO: make this work for external (web) resources too
+            unless script.content
+                path = fs.path.join basepath, script
+                script.content = fs.readFileSync path, 'utf8'
+
+            script.content
 
         env =
             html: index
