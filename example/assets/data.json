@@ -1,0 +1,22 @@
+[
+    {
+        "name": "guitar",
+        "type": "chordophone"
+    },
+    {
+        "name": "xylophone",
+        "type": "idiophone"
+    },
+    {
+        "name": "violin",
+        "type": "chordophone"
+    },
+    {
+        "name": "trumpet",
+        "type": "aerophone"
+    },
+    {
+        "name": "kettle drums",
+        "type": "membranophone"
+    }
+]

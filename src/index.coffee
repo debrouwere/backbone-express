@@ -50,7 +50,7 @@ exports.serve = (root, port) ->
         scripts = [
             'vendor/jquery/1.7.1/jquery.min.js',
             'vendor/underscore/1.3.1/underscore.min.js',
-            'vendor/backbone/0.9.1/backbone.min.js'
+            'vendor/backbone-express/0.1.0/backbone-express.min.js'
             'vendor/jade/0.21.0/runtime.min.js'
             ]
 

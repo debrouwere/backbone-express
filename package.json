@@ -20,7 +20,8 @@
     "optimist": "0.3.x"
   },
   "devDependencies": {
-    "mocha": "0.14.x"
+    "mocha": "0.14.x",
+    "uglify-js": "1.x"
   },
   "scripts": {
     "install": "make"

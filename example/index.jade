@@ -3,17 +3,11 @@ html
     head
         title A Backbone Express example app
         // vendor code
-        // TODO: it'd be nice if backbone-express-client already included Backbone
-        // so you don't need to load both of them separately and so there's no
-        // possibility of version mismatches
-        // TODO: while apps should use backbone-express-client as a regular
-        // vendor script (as we do here), that's not where it should live
-        // in the backbone-express project.
         script(src='vendor/jquery/1.7.1/jquery.min.js')
         script(src='vendor/underscore/1.3.1/underscore.min.js')
-        script(src='vendor/backbone/0.9.1/backbone.min.js')
         script(src='vendor/jade/0.21.0/runtime.min.js')
-        script(src='vendor/backbone-express-client/0.1.0/index.coffee')
+        // the backbone-express client-side code includes backbone too
+        script(src='vendor/backbone-express/0.1.0/backbone-express.min.js')
         // templates need to be loaded before views because they're used in those views
         script(src='templates/layout.jade', type='text/jade')      
         script(src='templates/home.jade', type='text/jade')      
@@ -21,5 +15,8 @@ html
         script(src='models.coffee')
         script(src='views.coffee')
         script(src='routes.coffee')        
-        script(src='init.coffee')      
+        script(src='init.coffee')
+              
+        // stylesheets
+        link(rel='stylesheet', href='assets/stylesheets/example.css')
     body
