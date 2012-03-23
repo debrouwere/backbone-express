@@ -1,3 +1,5 @@
+## Philosophy and architecture
+
 The point is that your application should work entirely client-side, and that you can add backbone-express to an existing project at the very end of development with little to no hassle. (The exception would be when you use backbone-express's API proxying support, in which case you do need to have that proxy running.) Therefore, sometimes we'll have to do things in a way that may be a tad bit more cumbersome than if we can assume a server process running at all times (to do neat things like compilation and concatenation) but that's just how it is.
 
 1. read in index.html, parse it, find all javascript files, load them and collect all Backbone models, collections and routers, which we can then hook up to our existing code and do the server-side thing
@@ -9,18 +11,17 @@ Note that, for step (1), we can do precompilations and all that sort of thing si
 
 This is okay, though, because it's a one-time process: we only need to find those models and routers on startup and that's it.
 
----
+## Thoughts / implementation details
 
 Template precompilation will put templates in an object under `jade.templates`, `Handlebars.templates` et cetera so to make it easy on yourself, you should make sure that client-side compilation does the same thing.
 
 ---
 
-Preferably, users would put models (plus collections) and routers on `window.models` and `window.routers` respectively, but if those keys don't exist we'll look for what we need by looping through everything that's on `window` (that is, global variables).
-
----
-
 Also, this is probably a non-issue, but backbone-express needs to play nice with draughtsman, that is, in dev mode, the livereloader should just work.
 
----
+## Todo
 
-The entrypoint for our backbone-express CLI doesn't have to be an HTML file -- Railgun can take care of this.
+* better error messages
+* easier building and serving process, should work transparently with CoffeeScript
+* live rebuilding
+* better inline docs and getting started docs

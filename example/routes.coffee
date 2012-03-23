@@ -1,11 +1,4 @@
-#Backbone = require 'backbone-express-client'
-#async = require 'async'
-#views = require './views'
-#models = require './models/models'
-
-{Express, views} = window
-
-window.test = yes
+{Express, views, models} = window
 
 # TODO: express-client should initialize this
 window.routers = routers = {}
@@ -21,10 +14,13 @@ class routers.Router extends Express.Router
 
     home: ->
         @render [views.Home], instruments: []
+
+        log new models.Instruments().query()
         
-        #async.parallel queries, (error, resources) =>
-        #new models.Instruments().query() (errors, instruments) =>
-        #    @render [views.Home], instruments: instruments
+        ###
+        new models.Instruments().query() (errors, instruments) =>
+            @render [views.Home], instruments: instruments
+        ###
 
     detail: ->
         @render [views.Detail]

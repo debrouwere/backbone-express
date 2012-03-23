@@ -2,39 +2,78 @@
 
 Backbone-express is a compatibility layer that allows you to run client-side Backbone applications on the server. With Backbone-express your site will gracefully degrade for clients that don't have JavaScript, including search engines.
 
-This application is useful if (and only if) you want to build a website entirely in JavaScript, yet still need it to be searchable. Working on a website that is sort of in between a site and an app, is api-driven, needs to be searchable, and you were planning on using Backbone anyway? This is for you.
+This application is useful if (and only if) you want to build a website entirely in JavaScript, yet still need it to be searchable. If you are working on a website that is sort of in between a site and an app, is API-driven, needs to be searchable and you were planning on using Backbone anyway, this is for you.
 
-When not to use Backbone-express? If your website doesn't have a big JavaScript component (most news websites, say), use a server-side framework like Django or Rails or Express instead. If your website is really an app, it makes no sense for Google to index anything and you should use plain Backbone without the overhead of Backbone-express.
+When not to use Backbone-express?
 
-Backbone-express tries to be transparent. You can't quite feed it a client-side Backbone.js and get it to work server-side as-is, but required changes are minimal.
+* If your website doesn't have a big JavaScript component (most news websites, say), use a server-side framework like Django or Rails or Express instead.
+* If your website is really an app, it makes no sense for Google to index anything and you should use plain Backbone without the overhead of Backbone-express.
 
 ## Project status
 
 Backbone-express is highly experimental, alpha, under heavy development, however you'd like to call it. Please don't use this... yet.
 
-## Features
+## Installation
 
-* Translates Backbone.js routes into express.js routes on the server
-* Renders Backbone.js views without the need for a global `window` object
-* With the help of Ender, bundles up your application JavaScript, templates and vendor libraries
-* `require` in the browser, so you can split your application into logical chunks
-* Provides `/api/<collection>` and `/api/<collection>/<id>` endpoints so you don't have to worry about cross-domain scripting
+`npm install backbone-express -g`
 
 ## Getting started
 
-1. `var Backbone = require('backbone-express-client');` -- you'll be using this instead of plain Backbone
-2. Create a Backbone router with some routes and a Backbone view.
-3. You can render that view with `this.render([view, ...], options)` on your router object. You'll want to do this instead of calling `view.render` directly, because `router.render` will facilitate server-side template rendering.
-4. Initialize your app by `require`'ing your router, instantiating it and then enabling HTML5 `pushState` support with `Backbone.history.start({pushState: true, silent: true});`.
-5. Hijack link clicks in your application so they use `router.navigate(url, true)` instead of actually requesting the page behind that link.
-6. Create a layout chrome template and a view template. Specify the layout as a static property on your router. Require the view template and specify it as a static property on your view. Your router and view will then take care of rendering whatever needs to be rendered, both client-side and server-side.
-7. In your layout chrome, make sure to load the `ender.min.js` and `application.min.js` scripts, and to run your initialization script, e.g. by opening a script tag and running `require('initialize');` or however your init script from step 4 is called.
+You can turn any Backbone.js app into a Backbone-express app with a couple of easy steps
 
-Note that Backbone-express is centered entirely around your routes. If you have views that only render whenever a model changes or whenever an event occurs, but not when a route activated, those will only work client-side. (Though they won't crash your server.) Backbone-express provides graceful degradation, not emulation.
+1. Load `backbone-express.min.js` instead of `backbone.min.js`
+2. Have routers, models and collections extend from `Express` instead of `Backbone`, e.g. use `Express.Router` instead of `Backbone.Router`
+3. Put models and collections on `window.models`, routers on `window.routers` and views on `window.views`
+4. Start Backbone's history with `Backbone.history.start({pushState: true, silent: true});` to enable HTML5 pushState support and to suppress rendering on initial page load (because it's already been rendered server-side)
 
-## Todo
+Now you can serve your app with `backbone-express path/to/app.html`.
 
-* better error messages
-* easier building and serving process, should work transparently with CoffeeScript
-* live rebuilding
-* better inline docs and getting started docs
+Backbone-express will render your application server-side on initial requests: for clients that don't support JavaScript or when your JavaScript hasn't loaded yet (before your router is activated). Essentially, it translates your Backbone routes into [Express.js](http://expressjs.com/) routes and renders view on the server whenever necessary.
+
+Note that Backbone-express is centered entirely around your routes. If you have views that only render whenever a model changes or whenever an event occurs, but not when a route activated, those will only work client-side. (They won't crash your server, though.) Backbone-express provides graceful degradation on the server, not emulation.
+
+The source code contains a complete example app -- check it out.
+
+### Optimization
+
+Backbone-express also minifies and concatenates your JavaScript and modifies your HTML to point to an optimized `application.min.js` instead, so don't worry about splitting up your application into separate files for models, views and routes.
+
+To learn more about optimization works, look at the documentation for the [Railgun](https://github.com/stdbrouw/railgun) application, which takes care of this for Backbone-express.
+
+## Advanced usage
+
+Backbone-express has a couple of tricks up its sleeve beyond providing a server-side compatibility layer for Backbone. You're free to use or not use these additional features as you please.
+
+### API proxy
+
+If you want to access external APIs through JavaScript without using [CORS](http://en.wikipedia.org/wiki/Cross-origin_resource_sharing) or [JSONP](http://en.wikipedia.org/wiki/JSONP), you can use Backbone-express its built-in API proxy.
+
+To use the API proxy, don't override `Collection#url` but instead put your API endpoint on `Collection#endpoint` instead. Backbone-express will then take care of proxying requests to other servers through `/api/:collection` and `/api/:collection/:id` routes on the app server.
+
+### Preprocessing
+
+Before serving your application, Backbone-express will actually optimize it, preprocess anything it can (such as CoffeeScript, LESS and other CSS preprocessors) and precompile templates (such as Handlebars, Jade or Mustache).
+
+For example, if you have `<script src="templates/dashboard.handlebars" type="text/x-handlebars-template"></script>` in your html, Backbone-express will precompile that template and make it a part of your `application.min.js`. Your template would be available under `window.Handlebars.templates`.
+
+Even the "single page" of your single-page app can be in any template language you choose. Serving `backbone-express path/to/app.handlebars` will work just fine.
+
+Optimization is taken care of by [Railgun](https://github.com/stdbrouw/railgun), which in turn depends on [Tilt.js](https://github.com/stdbrouw/tilt.js) to preprocess templates, compile-to-JavaScript languages and so forth.
+
+You can look at the documentation for Railgun and Tilt.js to find out more about the optimization and preprocessing capabilities of Backbone-express.
+
+### Environments
+
+Backbone-express has support for development environments using [Envv](https://github.com/stdbrouw/envv), allowing you to change what code executes depending on whether you're in a development or production environment. This can be useful to disable error logging or analytics in development.
+
+Environments can also be useful when using template preprocessors or CoffeeScript. A contrived example: 
+
+    <script src="models.coffee" data-runtime="build/models.js" />
+
+(The example is contrived because Backbone-express will actually precompile CoffeeScript for you -- see the documentation about preprocessing above.)
+
+Read more about environments and how you can use them in your application in the [Envv](https://github.com/stdbrouw/envv) documentation.
+
+## Troubleshooting
+
+To make sure server-side rendering actually works, it makes sense to disable JavaScript in your browser or your testing framework.

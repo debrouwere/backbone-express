@@ -2,8 +2,6 @@
 # Express.initialize(window) function.
 
 $(document).ready ->
-    #window.Backbone = Backbone = require 'backbone'
-    #{Router} = require './routes'
     router = new window.routers.Router()
 
     state = Backbone.history.start
