@@ -15,7 +15,7 @@ class routers.Router extends Express.Router
     home: ->
         @render [views.Home], instruments: []
 
-        log new models.Instruments().query()
+        #log new models.Instruments().query()
         
         ###
         new models.Instruments().query() (errors, instruments) =>

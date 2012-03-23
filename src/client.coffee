@@ -29,7 +29,6 @@ class exports.Router extends Backbone.Router
         # TODO: @server disabled because it's not working, but we really do need 
         # to make this distinction or client-side rendering will be really suboptimal
         if @layout and window.Express.isServer
-            log 'ADD LAYOUT'
             views.unshift @layout
     
         # TODO: if we keep view.prepare in there, we'll need to replace 
@@ -51,7 +50,7 @@ class exports.Router extends Backbone.Router
         # we want, we still need to send it to the client
         if @server
             html = '<!DOCTYPE html>\n' + window.document.getElementsByTagName('html')[0].outerHTML
-            log "rendering #{@server.req.url}"
+            log "#{new Date()} GET #{@server.req.url}"
             @server.res.send html
 
         return this
@@ -64,7 +63,6 @@ class exports.View extends Backbone.View
     # `window` is a keyword argument because on the server, we explicitly
     # pass in a window object since there's no `window` global
     render: ->
-        log 'VIEW RENDER FOR ' + @id
         if @id
             el = window.document.getElementById @id
         else

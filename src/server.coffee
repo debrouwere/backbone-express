@@ -54,9 +54,10 @@ exports.createServer = (routers, models) ->
     # TODO: support multiple routers (most apps only have one, but not always)
     Router = routers.Router
     router = new Router()
-    
+
+    console.log "ROUTES"
     _(router.routes).each (view, route) ->
-        console.log "mapped /#{route} to #{view}"
+        console.log "    /#{route} => #{view}"
         app.get '/' + route, (req, res) ->
             router.server = {req, res}
             router[view].apply router, _.values req.params

@@ -38,9 +38,6 @@ server = require './server'
 
 exports.serve = (root, port) ->
     railgun.bundle root, (errors, bundle) ->
-        # console.log bundle
-        #console.log JSON.stringify bundle, undefined, 4
-
         index = (bundle.find '/index.jade').content
         application = (bundle.find '/application.min.js').content
 
