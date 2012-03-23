@@ -1,7 +1,5 @@
 exports ?= {}
 
-exports.isServer = process?
-
 # DEBUGGING
 
 log = ->
@@ -19,16 +17,6 @@ methods =
     update: "put"
     delete: "del"
 
-establish_window = (callback) ->
-    return callback undefined, window
-
-    if process?
-        jsdom = require 'jsdom'
-        jsdom.env '<html></html>', (errors, window) ->
-            callback errors, window
-    else
-        callback undefined, window
-
 exports.url_for = (object) ->
     if object.url instanceof Function
         object.url()
@@ -44,30 +32,29 @@ class exports.Router extends Backbone.Router
             log 'ADD LAYOUT'
             views.unshift @layout
     
-        establish_window (errors, __) =>
-            # TODO: if we keep view.prepare in there, we'll need to replace 
-            # this with async.series because subviews may depend on a more 
-            # general view being rendered first.
+        # TODO: if we keep view.prepare in there, we'll need to replace 
+        # this with async.series because subviews may depend on a more 
+        # general view being rendered first.
+        
+        for view in views
+            # TODO: run view.prepare first before rendering
+            # (Or should fetching models not be a part of view rendering? Fair question.)
+
+            # If we get a view that's already instantiated, we 
+            # don't try to instantiate it again
+            unless view.options?
+                view = new view options
             
-            for view in views
-                # TODO: run view.prepare first before rendering
-                # (Or should fetching models not be a part of view rendering? Fair question.)
+            view.render window
 
-                # If we get a view that's already instantiated, we 
-                # don't try to instantiate it again
-                unless view.options?
-                    view = new view options
-                
-                view.render window
+        # on the server, once we've molded our window.document to look exactly how
+        # we want, we still need to send it to the client
+        if @server
+            html = '<!DOCTYPE html>\n' + window.document.getElementsByTagName('html')[0].outerHTML
+            log "rendering #{@server.req.url}"
+            @server.res.send html
 
-            # on the server, once we've molded our window.document to look exactly how
-            # we want, we still need to send it to the client
-            if @server
-                html = '<!DOCTYPE html>\n' + window.document.getElementsByTagName('html')[0].outerHTML
-                log "rendering #{@server.req.url}"
-                @server.res.send html
-
-            return this
+        return this
 
 class exports.View extends Backbone.View
     _ensureElement: ->
@@ -76,16 +63,15 @@ class exports.View extends Backbone.View
 
     # `window` is a keyword argument because on the server, we explicitly
     # pass in a window object since there's no `window` global
-    render: (window = window) ->    
+    render: ->
         log 'VIEW RENDER FOR ' + @id
         if @id
             el = window.document.getElementById @id
         else
-            # TODO: with the new way the app is set up, 
-            # where all your scripts and such are in the entrypoint file (index.tpl), 
-            # it would seem to make much more sense to have layouts apply to `body`
-            # instead, to prevent duplication.
-            el = window.document.getElementsByTagName('html')[0]
+            # for client-side apps, it makes much more sense to apply layouts to the body and not 
+            # to the entire document -- that stuff should be in your app entrypoint: the single
+            # page people refer to when talking about single-page apps.
+            el = window.document.getElementsByTagName('body')[0]
 
         el.innerHTML = @template(@options)
 

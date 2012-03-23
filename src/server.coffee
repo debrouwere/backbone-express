@@ -44,11 +44,11 @@ getCollections = (models) ->
         # collections have an `all` method, models do not
         object::all?
 
-exports.serve = (root, routers, models) ->
+exports.createServer = (routers, models) ->
     app = express.createServer()
     
     # serve static assets
-    app.use '/assets', express.static root + '/lib/assets'
+    # app.use '/assets', express.static root + '/lib/assets'
 
     # translate backbone.js client-side routes into express.js server-side routes
     # TODO: support multiple routers (most apps only have one, but not always)
