@@ -22,6 +22,6 @@ Also, this is probably a non-issue, but backbone-express needs to play nice with
 ## Todo
 
 * better error messages
-* easier building and serving process, should work transparently with CoffeeScript
 * live rebuilding
 * better inline docs and getting started docs
+* pony: enable logging (preferably with a client-side logging endpoint [though what/how to log is up to the user on the client-side], so we can merge client-side and server-side errors in a single file)

@@ -2,8 +2,39 @@
 
 fs = require 'fs'
 fs.path = require 'path'
-{argv} = require 'optimist'
+program = require 'commander'
 Express = require '../src'
 
-root = fs.path.join process.cwd(), argv._[0]
+program
+    .usage '[options] <entrypoint>'
+
+# envv-related options
+program    
+    .option '-e, --environment [name]',
+        'the environment you want the output to adhere to [production]', 'production'
+    .option '-p, --prefix [name]', 
+        'the namespace prefix you use on environment data attributes, if any'
+    .option '-h, --hint [pairs]',
+        'provide hints to the CDN probe about where to find obscure or badly named libraries', ''
+    .parse process.argv
+
+# railgun-related options
+program
+    .option '-r, --resource-root [root]',
+        'A URL segment to be used as a prefix for all static file references, useful when using a separate hosting environment for static files (chiefly CDNs) in production'
+    .option '-i --ignore',
+        'ignore, using the .gitignore format, files that should not be included in the build'
+    .option '-n, --noop',
+        'pass through, without processing, files that should be in the build but should not be touched'
+
+# backbone-express-specific options
+program
+    .option '-p, --port [number]',
+        'The port on which Backbone-Express should serve your application'
+    .option '-a, --api', 
+        'Enable the API proxy'
+    .option '-l, --log [path]',
+        'Output logs to a file. Specify two paths to split out info and error logs.'
+
+root = fs.path.join process.cwd(), program.args[0]
 Express.serve root, 3000

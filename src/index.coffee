@@ -1,18 +1,4 @@
 ###
-DONE
-
-- work on HTML parsing and getting all models, collections and routers first
-- then integrate that with the existing backbone-express code (start with just routes, proxy is less important)
-- modify the example so it works entirely on the client-side (save for fetching data), meaning template compilation, stylus compilation etc.
-- integrate the proxy code from the old backbone-express again
-
-TODO
-
-- CLI with -p --port to pick a port, and -n --no-api for users that don't want the proxy
-- enable logging (preferably with a client-side logging endpoint [though what/how to log is up to the user on the client-side], so we can merge client-side and server-side errors in a single file)
-###
-
-###
 We need to do two passes through index.html
 
 1. concatenation, optimization and preprocessing (using the Railgun API)
