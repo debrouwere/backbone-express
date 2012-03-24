@@ -13,14 +13,10 @@ class routers.Router extends Express.Router
         'about': 'detail'
 
     home: ->
-        @render [views.Home], instruments: []
-
-        #log new models.Instruments().query()
+        #@render [views.Home], instruments: []
         
-        ###
         new models.Instruments().query() (errors, instruments) =>
             @render [views.Home], instruments: instruments
-        ###
 
     detail: ->
         @render [views.Detail]

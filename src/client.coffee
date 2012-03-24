@@ -24,12 +24,6 @@ exports ?= {}
 log = ->
     window.log.apply @, arguments
 
-if process?
-    Backbone = require 'backbone'
-    request = require 'request'
-else
-    Backbone = window.Backbone
-
 methods =
     create: "post"
     read: "get"
@@ -98,28 +92,12 @@ class exports.View extends Backbone.View
 
         return this
 
-exports.sync = (method, model, options) ->
-    params =
-        method: methods[method]
-        uri: exports.url_for(model)
-
-    request params, (error, response, body) ->
-        content = JSON.parse body
-    
-        if !error and response.statusCode < 300
-            options.success content, response
-        else
-            options.error error, response
-
 class exports.Model extends Backbone.Model
-    sync: exports.sync
 
 error = (model, response) ->
     throw new Error("Couldn't fetch #{model}.")
 
 class exports.Collection extends Backbone.Collection
-    sync: exports.sync
-
     # fetch content from external APIs through a relay when fetching client-side, 
     # to avoid AJAX cross-domain limitations
     url: ->

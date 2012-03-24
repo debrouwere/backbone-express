@@ -41,7 +41,10 @@ exports.serve = (root, port) ->
             html: index
             src: scripts
             done: (errors, window) ->
+                # TODO: move this to the `server` namespace
                 window.Express.isServer = yes
+                window.Backbone.sync = server.sync
+                
                 window.log = console.log
 
                 # create our backbone-express compatibility server
@@ -50,4 +53,5 @@ exports.serve = (root, port) ->
                 express.use railgun.static bundle
                 # listen on specified port
                 express.listen port
+            
         jsdom.env env

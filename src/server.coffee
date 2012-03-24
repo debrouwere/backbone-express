@@ -24,9 +24,7 @@ url_for = (object) ->
     else if typeof object.url is 'string'
         object.url
 
-sync = (method, model, options) ->
-    console.log typeof model.url
-
+sync = exports.sync = (method, model, options) ->
     params =
         method: methods.http[method]
         uri: url_for(model)

@@ -11,11 +11,10 @@
   },
   "main": "lib/index.js",
   "dependencies": {
-    "backbone": "",
     "express": "2.x",
     "underscore": "1.x",
     "underscore.string": "",
-    "request": "1.x",
+    "request": "2.x",
     "jsdom": "0.2.x",
     "railgun": "0.1.x",
     "optimist": "0.3.x"
