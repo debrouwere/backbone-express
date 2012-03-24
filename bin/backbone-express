@@ -1,0 +1,9 @@
+#!/usr/bin/env coffee
+
+fs = require 'fs'
+fs.path = require 'path'
+{argv} = require 'optimist'
+Express = require '../src'
+
+root = fs.path.join process.cwd(), argv._[0]
+Express.serve root, 3000

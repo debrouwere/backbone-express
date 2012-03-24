@@ -29,12 +29,10 @@ We need to do this in JSDOM and execute all JavaScript on the page because you c
 fs = require 'fs'
 fs.path = require 'path'
 _ = require 'underscore'
+jsdom = require 'jsdom'
 # TODO: once railgun is more stable, require it as a regular package
 railgun = require '/Users/stdbrouw/Projects/Apps/railgun/src'
-jsdom = require 'jsdom'
 server = require './server'
-
-{argv} = require 'optimist'
 
 exports.serve = (root, port) ->
     basepath = fs.path.dirname root
@@ -57,15 +55,6 @@ exports.serve = (root, port) ->
             html: index
             src: scripts
             done: (errors, window) ->
-                ###
-                console.log errors
-                console.log window.Backbone?
-                console.log window.Express?
-                console.log _.keys window.models
-                console.log _.keys window.views
-                console.log _.keys window.jade.templates
-                ###
-
                 window.Express.isServer = yes
                 window.log = console.log
 
@@ -76,7 +65,3 @@ exports.serve = (root, port) ->
                 # listen on specified port
                 express.listen port
         jsdom.env env
-
-root = fs.path.join process.cwd(), argv._[0]
-
-exports.serve root, 3000

@@ -1,3 +1,22 @@
+###
+Rendering API (optional)
+
+    @render [view_a, view_b, view_c], options
+
+also possible:
+
+    @render [new view_a(options), view_b, view_c], options
+
+when given an initiated view, it'll render it, and when given a class, it'll 
+instantiate that class first, with any general options if specified
+
+What about partial renders? Well, we can respond to click events etc.
+with partial renders, but for pages we need a full render.
+Potentially, we could specify a default layout somewhere so the client-side
+can skip a full rerendering on page changes (PJAX-like) but the server-side
+knows where to get the chrome it needs
+###
+
 exports ?= {}
 
 # DEBUGGING
@@ -17,6 +36,8 @@ methods =
     update: "put"
     delete: "del"
 
+exports.isServer = no
+
 exports.url_for = (object) ->
     if object.url instanceof Function
         object.url()
@@ -26,8 +47,6 @@ exports.url_for = (object) ->
 class exports.Router extends Backbone.Router
     render: (views, options = {}) ->    
         # we only render layout chrome when we really need to (a.k.a. on the server)
-        # TODO: @server disabled because it's not working, but we really do need 
-        # to make this distinction or client-side rendering will be really suboptimal
         if @layout and window.Express.isServer
             views.unshift @layout
     
@@ -114,22 +133,3 @@ class exports.Collection extends Backbone.Collection
         (success) => @fetch {data, success, error}
 
 window.Express = _.extend {}, Backbone, exports
-
-###
-Rendering API (server-side and client-side)
-
-    @render [view_a, view_b, view_c], options
-
-also possible:
-
-    @render [new view_a(options), view_b, view_c], options
-
-when given an initiated view, it'll render it, and when given a class, it'll 
-instantiate that class first, with any general options if specified
-
-What about partial renders? Well, we can respond to click events etc.
-with partial renders, but for pages we need a full render.
-Potentially, we could specify a default layout somewhere so the client-side
-can skip a full rerendering on page changes (PJAX-like) but the server-side
-knows where to get the chrome it needs
-###
